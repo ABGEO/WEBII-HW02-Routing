@@ -58,7 +58,7 @@ class Request
      */
     public function getPath()
     {
-        return $_SERVER['PATH_INFO'];
+        return isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '/';
     }
 
     /**

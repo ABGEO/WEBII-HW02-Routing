@@ -1,0 +1,17 @@
+{
+  "homepage": {
+    "path": "/",
+    "method": "get",
+    "action": "web2hw\\DefaultController::index"
+  },
+  "about": {
+    "path": "/about",
+    "method": "GET",
+    "action": "web2hw\\DefaultController::about"
+  },
+  "get-routes": {
+    "path": "/routes",
+    "method": "GET",
+    "action": "web2hw\\DefaultController::routes"
+  }
+}
