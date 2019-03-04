@@ -13,5 +13,10 @@
     "path": "/routes",
     "method": "GET",
     "action": "web2hw\\DefaultController::routes"
+  },
+  "say-hello": {
+    "path": "/hello/{name}/{surname}",
+    "method": "GET",
+    "action": "web2hw\\DefaultController::sayHello"
   }
 }

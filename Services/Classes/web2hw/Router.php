@@ -37,29 +37,74 @@ class Router
         $requestMethod = $request->getMethod();
         $routes = $this->routes;
         $controllersPath = $this->controllersPath;
+        $routeFound = false;
 
         foreach ($routes as $route) {
-            $path = $route['path'];
+            $path = $this->convertToRE($route['path']);
             $method = strtoupper($route['method']);
+            $match = array();
 
-            if ($path == $requestUrl && $method == $requestMethod) {
+            if ($requestMethod == $method && preg_match($path, $requestUrl, $match)) {
+                $routeFound = true;
+                unset($match[0]);
+
                 $action = explode('::', $route['action']);
                 $controller = explode('\\', $action[0]);
                 $controllerFile = $controllersPath . '/' . $controller[1] . '.php';
 
+                //Include controller file
                 if (file_exists($controllerFile))
                     require_once $controllerFile;
                 else
                     die ('Controller ' . $action[0] . ' not found!');
 
+                //Get controllers new object
                 $object = new $action[0]();
+
                 $objMethod = (string)$action[1];
 
                 if (!method_exists($object, $objMethod))
                     die ('Method ' . $objMethod . ' not found in controller ' . $action[0]);
 
-                $object->$objMethod();
+                if (empty($match))
+                    $object->$objMethod();
+                else
+                    $object->$objMethod($match);
             }
         }
+
+        if (!$routeFound) {
+            $response = new Response("Route {$requestUrl} Not Found!", 404);
+            echo $response->sendResponse();
+        }
+    }
+
+    /**
+     * Convert route to regular expression
+     *
+     * @param $plainText
+     * @return string
+     */
+    private function convertToRE($plainText)
+    {
+        $plainText = str_replace('/', "\/", $plainText);
+
+        $lastMatch = 0;
+        while ($start = strpos($plainText, '{', $lastMatch)) {
+            $end = strpos($plainText, '}', $lastMatch);
+
+            //Cut tet for replacing
+            $changeMe = substr($plainText, $start, $end - $start + 1);
+
+            $reName = substr($changeMe, 1, strlen($changeMe) - 2);
+
+            $replace = "(?<{$reName}>[a-zA-Z0-9\_\-]+)";
+
+            $plainText = str_replace($changeMe, $replace, $plainText);
+
+            $lastMatch = $start + 1;
+        }
+
+        return "@^{$plainText}$@D";
     }
 }

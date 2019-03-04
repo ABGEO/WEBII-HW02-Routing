@@ -22,4 +22,9 @@ class DefaultController
         $response = new Response($routes, 200, ['Content-Type' => 'application/json']);
         echo $response->sendResponse();
     }
+
+    public function sayHello($args)
+    {
+        echo "Hello, I'm {$args['name']} {$args['surname']}";
+    }
 }

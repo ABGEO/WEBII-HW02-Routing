@@ -115,7 +115,7 @@ class Request
         $return = null;
 
         if ($method == 'GET')
-            $return = $_POST;
+            $return = $_GET;
         else if ($method == 'POST')
             $return = $_POST;
 
